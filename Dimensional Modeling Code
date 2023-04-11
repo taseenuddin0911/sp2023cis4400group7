@@ -1,0 +1,33 @@
+-- Dimensions
+CREATE TABLE location_dim (
+    location_key INTEGER PRIMARY KEY,
+    incident_zip VARCHAR(10),
+    borough VARCHAR(50),
+    latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6)
+);
+
+CREATE TABLE complaint_dim (
+    complaint_key INTEGER PRIMARY KEY,
+    complaint_type VARCHAR(50),
+    descriptor VARCHAR(100)
+);
+
+CREATE TABLE time_dim (
+    date_key INTEGER PRIMARY KEY,
+    date DATE,
+    day_of_week VARCHAR(10),
+    month VARCHAR(10),
+    year INTEGER
+);
+
+-- Fact table
+CREATE TABLE fact_311 (
+    unique_key INTEGER PRIMARY KEY,
+    created_date TIMESTAMP,
+    closed_date TIMESTAMP,
+    response_time INTEGER,
+    location_key INTEGER REFERENCES location_dim(location_key),
+    complaint_key INTEGER REFERENCES complaint_dim(complaint_key),
+    date_key INTEGER REFERENCES time_dim(date_key)
+);
