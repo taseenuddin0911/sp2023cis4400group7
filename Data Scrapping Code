@@ -1,0 +1,20 @@
+import requests
+from bs4 import BeautifulSoup
+
+# Send a request to the website and get the HTML content
+response = requests.get('https://livingwage.mit.edu/states/36')
+html_content = response.content
+
+# Parse the HTML content using BeautifulSoup
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Find the first table on the page
+table = soup.find('table')
+
+# Extract the data from the table
+rows = table.find_all('tr')
+for row in rows:
+    columns = row.find_all('td')
+    for column in columns:
+        print(column.text.strip(), end='\t')
+    print()
