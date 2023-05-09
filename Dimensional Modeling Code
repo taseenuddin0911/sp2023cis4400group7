@@ -1,19 +1,23 @@
+-- Create schema
+CREATE SCHEMA IF NOT EXISTS nycservicerequests;
+
 -- Dimensions
-CREATE TABLE location_dim (
+CREATE TABLE nycservicerequests.location_dim (
     location_key INTEGER PRIMARY KEY,
     incident_zip VARCHAR(10),
     borough VARCHAR(50),
     latitude DECIMAL(9,6),
-    longitude DECIMAL(9,6)
+    longitude DECIMAL(9,6),
+    location_type VARCHAR(25)
 );
 
-CREATE TABLE complaint_dim (
+CREATE TABLE nycservicerequests.complaint_dim (
     complaint_key INTEGER PRIMARY KEY,
     complaint_type VARCHAR(50),
     descriptor VARCHAR(100)
 );
 
-CREATE TABLE time_dim (
+CREATE TABLE nycservicerequests.time_dim (
     date_key INTEGER PRIMARY KEY,
     date DATE,
     day INTEGER,
@@ -22,12 +26,13 @@ CREATE TABLE time_dim (
 );
 
 -- Fact table
-CREATE TABLE fact_311 (
+CREATE TABLE nycservicerequests.fact_311 (
     unique_key INTEGER PRIMARY KEY,
     created_date TIMESTAMP,
     closed_date TIMESTAMP,
     response_time INTEGER,
-    location_key INTEGER REFERENCES location_dim(location_key),
-    complaint_key INTEGER REFERENCES complaint_dim(complaint_key),
-    date_key INTEGER REFERENCES time_dim(date_key)
+    location_key INTEGER REFERENCES nycservicerequests.location_dim(location_key),
+    complaint_key INTEGER REFERENCES nycservicerequests.complaint_dim(complaint_key),
+    date_key INTEGER REFERENCES nycservicerequests.time_dim(date_key),
+    resolution_description VARCHAR(255)
 );
