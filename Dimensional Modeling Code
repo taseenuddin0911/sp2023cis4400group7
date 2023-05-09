@@ -16,8 +16,8 @@ CREATE TABLE complaint_dim (
 CREATE TABLE time_dim (
     date_key INTEGER PRIMARY KEY,
     date DATE,
-    day_of_week VARCHAR(10),
-    month VARCHAR(10),
+    day INTEGER,
+    month INTEGER,
     year INTEGER
 );
 
