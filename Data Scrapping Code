@@ -1,0 +1,57 @@
+# Importing Libraries
+from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
+import os
+import requests
+from bs4 import BeautifulSoup
+import re
+import boto3
+import glob
+import pandas as pd
+from datetime import datetime
+from io import StringIO
+
+# API and parameters
+api_url = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
+
+#Get the current date and time
+current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+
+params = {
+    "$select": "descriptor, location_type, incident_zip, incident_address, street_name, cross_street_1, cross_street_2, intersection_street_1, intersection_street_2, address_type, city, landmark, status, resolution_description, resolution_action_updated_date, borough, created_date, closed_date",
+    "$where": f"created_date >= '2022-01-01T00:00:00.000' AND created_date <= '{current_date}'"
+ # Add more parameters as needed
+}
+ 
+# Query the API with parameters
+response = requests.get(api_url, params=params)
+response_data = response.json()
+ 
+# Convert the response to a DataFrame
+data = pd.DataFrame(response_data)
+data.to_csv("data/311servicerequests/response.csv")
+ 
+# Save the DataFrame as a CSV file in memory
+csv_buffer = StringIO()
+les = data.to_csv(csv_buffer, index=False)    
+
+# Amazon S3 Configuration
+s3_access_key = "AKIA4YSOYAOBYSRYCSKX"
+s3_secret_key = "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"
+s3_bucket_name = "2023cis4400project"
+s3_region = "us-east-1"
+ 
+# Upload files to Amazon S3
+def upload_to_s3(source_file, destination_path):
+ s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key, region_name=s3_region)
+ s3.upload_file(source_file, s3_bucket_name, destination_path)
+ 
+ servicerequestsFolders = ["data/311servicerequests"]
+
+for folder in servicerequestsFolders:
+    csv_files = glob.glob(os.path.join(folder, "*.csv"))
+    for csv_file in csv_files:
+        destination_path = os.path.join("uploaded311servicerequests", os.path.basename(csv_file))
+        
+        # Upload to Amazon S3
+        upload_to_s3(csv_file, destination_path)
+        print(f"Uploaded {csv_file} to S3")
