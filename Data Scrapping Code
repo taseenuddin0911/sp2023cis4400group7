@@ -34,9 +34,9 @@ data.to_csv("data/311servicerequests/response.csv")
 csv_buffer = StringIO()
 les = data.to_csv(csv_buffer, index=False)    
 
-# Amazon S3 Configuration
-s3_access_key = "AKIA4YSOYAOBYSRYCSKX"
-s3_secret_key = "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"
+# Amazon S3 Configuration - removed keys for security purposes.
+s3_access_key = ""
+s3_secret_key = ""
 s3_bucket_name = "2023cis4400project"
 s3_region = "us-east-1"
  
